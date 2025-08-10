@@ -1,3 +1,4 @@
+import { VNode } from "./vnode";
 export interface RendererOptions<HostNode = RendererNode> {
   setElementText(node: HostNode, text: string): void;
 }
@@ -16,11 +17,38 @@ export type RootRenderFunction<HostElement = RendererElement> = (
 ) => void;
 
 export function createRenderer(options: RendererOptions) {
-  const { setElementText: hostSetElementText } = options;
+  const {
+    createElement: hostCreateElement,
+    createText: hostCreateText,
+    insert: hostInsert,
+  } = options;
 
-  const render: RootRenderFunction = (message, container) => {
-    hostSetElementText(container, message); // 今回はメッセージを挿入するだけなのでこういう実装になっている
+  function renderVNode(vnode: VNode | string) {
+    if (typeof vnode === "string") return hostCreateText(vnode);
+    const el = hostCreateElement(vnode.type);
+
+    for (const child of vnode.children) {
+      const childEl = renderVNode(child);
+      hostInsert(childEl, el);
+    }
+
+    return el;
+  }
+
+  const render: RootRenderFunction = (vnode, container) => {
+    const el = renderVNode(vnode);
+    hostInsert(el, container);
   };
 
   return { render };
+}
+
+export interface RendererOptions<HostNode = RendererNode> {
+  createElement(type: string): HostNode; // 追加
+
+  createText(text: string): HostNode; // 追加
+
+  setElementText(node: HostNode, text: string): void;
+
+  insert(child: HostNode, parent: HostNode, anchor?: HostNode | null): void; // 追加
 }

@@ -1,4 +1,4 @@
-import { createApp } from "chibivue";
+import { createApp, h } from "chibivue";
 
 /**
  * アプリケーションインスタンスを作成する。
@@ -9,7 +9,10 @@ import { createApp } from "chibivue";
  */
 const app = createApp({
   render() {
-    return "Hello world.";
+    return h("div", {}, [
+      h("p", {}, ["Hello world."]),
+      h("button", {}, ["click me!"]),
+    ]);
   },
 });
 

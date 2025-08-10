@@ -1,5 +1,8 @@
-export type { App, CreateAppFunction } from "./apiCreateApp";
-export { createAppAPI } from "./apiCreateApp";
+export type * from "./apiCreateApp";
+export * from "./apiCreateApp";
 
-export type { RendererOptions } from "./renderer";
-export { createRenderer } from "./renderer";
+export type * from "./renderer";
+export * from "./renderer";
+
+export * from "./h";
+export type * from "./vnode";
