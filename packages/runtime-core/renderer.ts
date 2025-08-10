@@ -1,6 +1,12 @@
 import { VNode } from "./vnode";
-export interface RendererOptions<HostNode = RendererNode> {
+export interface RendererOptions<
+  HostNode = RendererNode,
+  HostElement = RendererElement
+> {
+  createElement(type: string): HostNode; // 追加
+  createText(text: string): HostNode; // 追加
   setElementText(node: HostNode, text: string): void;
+  patchProp(el: HostElement, key: string, value: any): void;
 }
 
 // RendererNode と RendererElement については一旦気にしないでください．
@@ -21,11 +27,16 @@ export function createRenderer(options: RendererOptions) {
     createElement: hostCreateElement,
     createText: hostCreateText,
     insert: hostInsert,
+    patchProp: hostPatchProp,
   } = options;
 
   function renderVNode(vnode: VNode | string) {
     if (typeof vnode === "string") return hostCreateText(vnode);
     const el = hostCreateElement(vnode.type);
+
+    Object.entries(vnode.props).forEach(([key, value]) => {
+      hostPatchProp(el, key, value);
+    });
 
     for (const child of vnode.children) {
       const childEl = renderVNode(child);
